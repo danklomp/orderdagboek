@@ -15,8 +15,8 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-03-01' = {
     tier: sku
   }
   properties: {
-    repositoryUrl: '<YOUR_REPOSITORY_URL>'
-    branch: '<YOUR_BRANCH>'
+    repositoryUrl: 'https://github.com/danklomp/orderdagboek'
+    branch: 'main'
     buildProperties: {
       appLocation: 'app'
       apiLocation: 'api'
