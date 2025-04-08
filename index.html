@@ -12,16 +12,16 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #000; /* Black background */
-            color: #fff; /* White text */
-            background-image: url('https://www.example.com/trading-illustration.jpg'); /* Replace with a trading-related illustration URL */
+            background-color: #000;
+            color: #fff;
+            background-image: url('https://www.example.com/trading-illustration.jpg');
             background-size: cover;
             background-position: center;
         }
         .container {
             text-align: center;
             padding: 20px;
-            background: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+            background: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
         }
@@ -34,24 +34,24 @@
             margin-bottom: 15px;
             width: 100%;
             max-width: 300px;
-            background: #333; /* Dark input background */
-            color: #fff; /* White text */
-            border: 1px solid #555; /* Subtle border */
+            background: #333;
+            color: #fff;
+            border: 1px solid #555;
             border-radius: 4px;
         }
         button {
-            background: #007bff; /* Blue button */
+            background: #007bff;
             color: #fff;
             border: none;
             cursor: pointer;
         }
         button:hover {
-            background: #0056b3; /* Darker blue on hover */
+            background: #0056b3;
         }
         .output {
             margin-top: 20px;
             font-weight: bold;
-            color: #0f0; /* Green text for output */
+            color: #0f0;
         }
     </style>
 </head>
@@ -61,6 +61,12 @@
         <form id="calculatorForm">
             <label for="accountSize">Account Size:</label>
             <input type="number" id="accountSize" placeholder="Enter account size" required>
+
+            <label for="currency">Currency:</label>
+            <select id="currency" required>
+                <option value="dollar">Dollar</option>
+                <option value="btc">BTC</option>
+            </select>
 
             <label for="entryPrice">Entry Price:</label>
             <input type="number" id="entryPrice" placeholder="Enter entry price" required>
@@ -86,6 +92,7 @@
     <script>
         function calculatePositionSize() {
             const accountSize = parseFloat(document.getElementById('accountSize').value);
+            const currency = document.getElementById('currency').value;
             const entryPrice = parseFloat(document.getElementById('entryPrice').value);
             const stopLoss = parseFloat(document.getElementById('stopLoss').value);
             const riskPercentage = parseFloat(document.getElementById('riskPercentage').value);
@@ -94,6 +101,12 @@
             if (isNaN(accountSize) || isNaN(entryPrice) || isNaN(stopLoss) || isNaN(riskPercentage)) {
                 document.getElementById('output').textContent = "Please fill in all fields with valid numbers.";
                 return;
+            }
+
+            let adjustedAccountSize = accountSize;
+
+            if (currency === "btc") {
+                adjustedAccountSize = accountSize * entryPrice; // Convert BTC to dollars using entry price
             }
 
             let riskPerUnit;
@@ -108,7 +121,7 @@
                 return;
             }
 
-            const riskAmount = (accountSize * riskPercentage) / 100;
+            const riskAmount = (adjustedAccountSize * riskPercentage) / 100;
             const positionSize = riskAmount / riskPerUnit;
 
             document.getElementById('output').textContent = `You should take a position size of: ${positionSize.toFixed(10)} units.`;
