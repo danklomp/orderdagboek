@@ -7,7 +7,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-- task: Checkout@3
+- task: Checkout@1
   displayName: 'Checkout code'
 
 - task: AzureCLI@2
