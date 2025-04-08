@@ -12,7 +12,7 @@ steps:
 
 - task: AzureCLI@2
   inputs:
-    azureSubscription: '<Your-Service-Connection-Name>'
+    azureSubscription: 'serviceson'
     scriptType: 'bash'
     scriptLocation: 'inlineScript'
     inlineScript: |
