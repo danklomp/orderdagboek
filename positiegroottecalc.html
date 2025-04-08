@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Position Size Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f9f9f9;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input, button, select {
+            padding: 8px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .output {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Position Size Calculator</h1>
+        <form id="calculatorForm">
+            <label for="accountSize">Account Size:</label>
+            <input type="number" id="accountSize" placeholder="Enter account size" required>
+
+            <label for="entryPrice">Entry Price:</label>
+            <input type="number" id="entryPrice" placeholder="Enter entry price" required>
+
+            <label for="stopLoss">Stop Loss Price:</label>
+            <input type="number" id="stopLoss" placeholder="Enter stop loss price" required>
+
+            <label for="riskPercentage">Risk Percentage (%):</label>
+            <input type="number" id="riskPercentage" placeholder="Enter risk percentage" required>
+
+            <label for="tradeType">Trade Type:</label>
+            <select id="tradeType" required>
+                <option value="long">Long</option>
+                <option value="short">Short</option>
+            </select>
+
+            <button type="button" onclick="calculatePositionSize()">Calculate Position Size</button>
+        </form>
+
+        <div class="output" id="output"></div>
+    </div>
+
+    <script>
+        function calculatePositionSize() {
+            const accountSize = parseFloat(document.getElementById('accountSize').value);
+            const entryPrice = parseFloat(document.getElementById('entryPrice').value);
+            const stopLoss = parseFloat(document.getElementById('stopLoss').value);
+            const riskPercentage = parseFloat(document.getElementById('riskPercentage').value);
+            const tradeType = document.getElementById('tradeType').value;
+
+            if (isNaN(accountSize) || isNaN(entryPrice) || isNaN(stopLoss) || isNaN(riskPercentage)) {
+                document.getElementById('output').textContent = "Please fill in all fields with valid numbers.";
+                return;
+            }
+
+            let riskPerUnit;
+            if (tradeType === "long") {
+                riskPerUnit = entryPrice - stopLoss;
+            } else if (tradeType === "short") {
+                riskPerUnit = stopLoss - entryPrice;
+            }
+
+            if (riskPerUnit <= 0) {
+                document.getElementById('output').textContent = "Invalid stop loss or entry price for the selected trade type.";
+                return;
+            }
+
+            const riskAmount = (accountSize * riskPercentage) / 100;
+            const positionSize = riskAmount / riskPerUnit;
+
+            document.getElementById('output').textContent = `You should take a position size of: ${positionSize.toFixed(10)} units.`;
+        }
+    </script>
+</body>
+</html>
