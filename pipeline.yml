@@ -1,0 +1,26 @@
+name: Deploy Static Web App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Azure CLI
+      uses: azure/CLI@v1
+
+    - name: Deploy Bicep file
+      run: |
+        echo "${{ secrets.AZURE_CLIENT_SECRET }}" > client_secret.txt
+        az login --service-principal -u 69197c16-a2f2-4bca-bb5d-c8cedafb7e02 -p @client_secret.txt --tenant ${{ secrets.AZURE_TENANT_ID }}
+        az deployment group create \
+          --resource-group ${{ secrets.AZURE_RESOURCE_GROUP }} \
+          --template-file static-webapp.bicep
+        rm client_secret.txt
