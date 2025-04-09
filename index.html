@@ -60,28 +60,34 @@
         <h1>Position Size Calculator</h1>
         <form id="calculatorForm">
             <label for="accountSize">Account Size:</label>
-            <input type="number" id="accountSize" placeholder="Enter account size" required>
+            <input type="number" id="accountSize" placeholder="Enter account size">
 
             <label for="currency">Currency:</label>
-            <select id="currency" required>
+            <select id="currency">
                 <option value="dollar">Dollar</option>
                 <option value="btc">BTC</option>
             </select>
 
             <label for="entryPrice">Entry Price:</label>
-            <input type="number" id="entryPrice" placeholder="Enter entry price" required>
+            <input type="number" id="entryPrice" placeholder="Enter entry price">
 
             <label for="stopLoss">Stop Loss Price:</label>
-            <input type="number" id="stopLoss" placeholder="Enter stop loss price" required>
+            <input type="number" id="stopLoss" placeholder="Enter stop loss price">
 
             <label for="riskPercentage">Risk Percentage (%):</label>
-            <input type="number" id="riskPercentage" placeholder="Enter risk percentage" required>
+            <input type="number" id="riskPercentage" placeholder="Enter risk percentage">
 
             <label for="tradeType">Trade Type:</label>
-            <select id="tradeType" required>
+            <select id="tradeType">
                 <option value="long">Long</option>
                 <option value="short">Short</option>
             </select>
+
+            <label for="positionSize">Position Size:</label>
+            <input type="number" id="positionSize" placeholder="Enter position size">
+
+            <label for="tpSize">TP-Size (%):</label>
+            <input type="number" id="tpSize" placeholder="Enter TP size percentage (1-100)" min="1" max="100">
 
             <button type="button" onclick="calculatePositionSize()">Calculate Position Size</button>
         </form>
@@ -97,34 +103,44 @@
             const stopLoss = parseFloat(document.getElementById('stopLoss').value);
             const riskPercentage = parseFloat(document.getElementById('riskPercentage').value);
             const tradeType = document.getElementById('tradeType').value;
+            const positionSizeInput = parseFloat(document.getElementById('positionSize').value);
+            const tpSize = parseFloat(document.getElementById('tpSize').value);
 
-            if (isNaN(accountSize) || isNaN(entryPrice) || isNaN(stopLoss) || isNaN(riskPercentage)) {
-                document.getElementById('output').textContent = "Please fill in all fields with valid numbers.";
-                return;
+            let outputMessage = "";
+
+            if (!isNaN(accountSize) && !isNaN(entryPrice) && !isNaN(stopLoss) && !isNaN(riskPercentage)) {
+                let adjustedAccountSize = accountSize;
+
+                if (currency === "btc") {
+                    adjustedAccountSize = accountSize * entryPrice; // Convert BTC to dollars using entry price
+                }
+
+                let riskPerUnit;
+                if (tradeType === "long") {
+                    riskPerUnit = entryPrice - stopLoss;
+                } else if (tradeType === "short") {
+                    riskPerUnit = stopLoss - entryPrice;
+                }
+
+                if (riskPerUnit > 0) {
+                    const riskAmount = (adjustedAccountSize * riskPercentage) / 100;
+                    const positionSize = riskAmount / riskPerUnit;
+                    outputMessage += `You should take a position size of: ${positionSize.toFixed(10)} units.\n`;
+                } else {
+                    outputMessage += "Invalid stop loss or entry price for the selected trade type.\n";
+                }
             }
 
-            let adjustedAccountSize = accountSize;
-
-            if (currency === "btc") {
-                adjustedAccountSize = accountSize * entryPrice; // Convert BTC to dollars using entry price
+            if (!isNaN(positionSizeInput) && !isNaN(tpSize) && tpSize >= 1 && tpSize <= 100) {
+                const tpResult = (positionSizeInput * tpSize) / 100;
+                outputMessage += `TP-Size result: ${tpResult.toFixed(10)} units.`;
             }
 
-            let riskPerUnit;
-            if (tradeType === "long") {
-                riskPerUnit = entryPrice - stopLoss;
-            } else if (tradeType === "short") {
-                riskPerUnit = stopLoss - entryPrice;
+            if (outputMessage === "") {
+                outputMessage = "Please fill in at least one set of fields with valid numbers.";
             }
 
-            if (riskPerUnit <= 0) {
-                document.getElementById('output').textContent = "Invalid stop loss or entry price for the selected trade type.";
-                return;
-            }
-
-            const riskAmount = (adjustedAccountSize * riskPercentage) / 100;
-            const positionSize = riskAmount / riskPerUnit;
-
-            document.getElementById('output').textContent = `You should take a position size of: ${positionSize.toFixed(10)} units.`;
+            document.getElementById('output').textContent = outputMessage;
         }
     </script>
 </body>
